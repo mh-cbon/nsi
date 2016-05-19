@@ -213,6 +213,8 @@ You must provide `nsiversion` and `start` fields.
 
 # Todo
 
+- add `edit` command !!
+- add `generate` command !!
 - improve this readme
 - add system wide service setup
 - add sysv support
