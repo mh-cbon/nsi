@@ -1,0 +1,9 @@
+/node_modules/
+/npm-debug.log
+/var/
+/.vagrant/
+/utils/
+/vagrant/
+/test/
+Vagrantfile
+mocha.sh

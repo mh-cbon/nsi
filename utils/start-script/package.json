@@ -1,0 +1,17 @@
+{
+  "name": "start-script",
+  "version": "1.0.0",
+  "description": "Fake package to test service setup from a start-script",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./fake-service.js 8091"
+  },
+  "keywords": [],
+  "author": "mh-cbon <mh-cbon@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+  }
+}

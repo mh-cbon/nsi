@@ -1,0 +1,48 @@
+{
+  "name": "@mh-cbon/nsi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "nsi": "./bin.js"
+  },
+  "keywords": [
+    "service",
+    "launchd",
+    "sc",
+    "chkconfig",
+    "systemd",
+    "upstart"
+  ],
+  "author": "mh-cbon <mh-cbon@users.noreply.github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@mh-cbon/chkconfig-simple-api": "^1.1.6",
+    "@mh-cbon/launchd-simple-api": "^1.3.4",
+    "@mh-cbon/pkg-source-to-pkg-json": "^1.0.2",
+    "@mh-cbon/sc-simple-api": "^1.0.16",
+    "@mh-cbon/sudo-fs": "^1.0.17",
+    "@mh-cbon/systemd-simple-api": "^2.1.5",
+    "@mh-cbon/upstart-simple-api": "^1.0.18",
+    "@mh-cbon/which-service-manager": "^1.0.4",
+    "appdirectory": "^0.1.0",
+    "async": "^1.5.2",
+    "cline-parser": "^1.0.3",
+    "compare-version": "^0.1.2",
+    "debug": "^2.2.0",
+    "debug-stream": "^3.0.1",
+    "inquirer": "^1.0.2",
+    "minimist": "^1.2.0",
+    "mkdirp": "^0.5.1",
+    "os-homedir": "^1.0.1",
+    "should": "^8.3.2",
+    "username": "^2.1.0",
+    "which": "^1.2.9"
+  },
+  "devDependencies": {
+    "should": "^8.3.1"
+  }
+}
