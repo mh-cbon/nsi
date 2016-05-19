@@ -2,7 +2,7 @@
 
 Install a node package as a service. Compatible with systemd, upstart, chkconfig, launchd, sc.
 
-Tested on windows server 2012, macos 10.9/10.10, fedora 23, centos6.
+Tested on windows server 2012, macos 10.9/10.10, fedora 23, centos6, ubuntu 14.04.
 
 # Install
 
