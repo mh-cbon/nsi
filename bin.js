@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var fs          = require('fs')
 var argv        = require('minimist')(process.argv.slice(2));
 var pkg         = require('./package.json');
