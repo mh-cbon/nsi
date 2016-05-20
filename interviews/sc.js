@@ -27,7 +27,7 @@ var scInterview = function (opts, done) {
     },
     function (next) {
       var AppDirectory = require('appdirectory')
-      var nsiPath = new (require('appdirectory'))(pkg.name).userData()
+      var nsiPath = new (require('appdirectory'))(opts.pkgName).userData()
 
       serviceId = opts.pkgName;
       var sOpts = {
@@ -35,12 +35,12 @@ var scInterview = function (opts, done) {
         description: opts.description || '',
         author: opts.author,
         wd: opts.wd || '',
-        stdout: path.join(nsiPath, serviceId + '.out'),
-        stderr: path.join(nsiPath, serviceId + '.err'),
+        stdout: path.join(nsiPath, serviceId + '.log'),
+        stderr: path.join(nsiPath, serviceId + '.log'),
       }
       var cmdPath = path.join(nsiPath, serviceId + '.cmd');
       debug('cmdPath=%s', cmdPath);
-      
+
       var cmd = ssa.generateCmdFile(opts.start.bin, opts.start.args, opts.env, sOpts)
       rootSsa.writeFile(cmdPath, cmd, function (err) {
         err && console.error(err);

@@ -66,8 +66,8 @@ var launchdInterview = function (opts, done) {
       next();
     },
     function (next) {
-      service.plist.StandardOutPath = lsa.forgeStdLogPath(service) + service.plist.Label+ ".out";
-      service.plist.StandardErrorPath = lsa.forgeStdLogPath(service) + service.plist.Label + ".err";
+      service.plist.StandardOutPath = lsa.forgeStdLogPath(service) + service.plist.Label+ ".log";
+      service.plist.StandardErrorPath = lsa.forgeStdLogPath(service) + service.plist.Label + ".log";
       debug('service=%j', service)
       next()
     },

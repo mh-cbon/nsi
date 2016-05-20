@@ -2,13 +2,13 @@ var spawn       = require('child_process').spawn;
 var fs          = require('fs')
 var async       = require('async')
 var yesNo       = require('../lib/yesno.js')
-var cLineParser = require('cline-parser');
 var npmInvoke   = require('../lib/npm-invoke.js')
 var isPkgInst   = require('../lib/is-pkg-installed.js')
 var whichSc     = require('@mh-cbon/which-service-manager');
 var pkg         = require('../package.json');
 var debug       = require('debug')(pkg.name);
 var stdErrors   = require('../lib/std-errors.js');
+var svcGen      = require('../lib/service-definition-generator.js')
 
 
 var install = function (argv, allDone) {
@@ -42,6 +42,9 @@ var install = function (argv, allDone) {
           })
         })
       }
+    },
+    function (next) {
+      if (scMngr==='sysv') return next('Sorry this init system is not yet handled.')
     },
     function (next) {
       getNameFromADirectoryPackage(pkgSource, function (voidErr, pkgName) {
@@ -95,14 +98,25 @@ var install = function (argv, allDone) {
       })
     },
     function (next) {
-      if (setupSource==='start')
-        serviceDefinition = serviceDefinitionFromStartScript(pkgInfo)
-      else if (setupSource==='file')
-        serviceDefinition = serviceDefinitionFromFile(pkgInfo);
+      var svcHandler;
+      if (setupSource==='start') svcHandler = svcGen.fromPkgJson;
+      else if (setupSource==='file') svcHandler = svcGen.fromNsiJs;
       else return next('Did find source definition')
-      serviceDefinition.pkgName = serviceDefinition.pkgName.match(/([^\/]+)$/)[1];
-      serviceDefinition.wd = pkgInfo.path;
-      evaluteServiceDefinitionQs(argv, serviceDefinition, next)
+      svcHandler(pkgInfo, function (err, svcDef) {
+        svcDef.pkgName = svcDef.pkgName.match(/([^\/]+)$/)[1];
+        svcDef.wd = pkgInfo.path;
+        // keep this. need to document why.
+        if (svcDef.start.bin==='node')
+          svcDef.start.bin = process.argv[0];
+        if (svcDef.reload && svcDef.reload.bin==='node')
+          svcDef.reload.bin = process.argv[0];
+        // keep this. need to document why.
+        svcGen.runtimeEval(argv, svcDef, function (err) {
+          if (err) return next(err);
+          serviceDefinition = svcDef;
+          next();
+        })
+      })
     },
     function (next) {
       testService(serviceDefinition, function (err) {
@@ -166,85 +180,6 @@ function testService(serviceDefinition, then) {
   } else setTimeout(function () {
     child.kill();
   }, 500);
-}
-
-function evaluteServiceDefinitionQs (argv, serviceDefinition, then) {
-  var todos = [];
-  if (serviceDefinition.start)
-    todos = todos.concat(evaluteServiceArgs(argv, serviceDefinition, serviceDefinition.start.args))
-  if (serviceDefinition.reload)
-    todos = todos.concat(evaluteServiceArgs(argv, serviceDefinition, serviceDefinition.reload.args))
-  if (serviceDefinition.env)
-    todos = todos.concat(evaluteServiceEnvs(argv, serviceDefinition, serviceDefinition.env))
-  debug('todos.length=%j', todos.length);
-  if (todos.length) console.log("Let s now configure options for the module");
-  return async.series(todos, then)
-}
-
-function evaluteServiceArgs (argv, serviceDefinition, args){
-  var todos = [];
-  args.forEach(function (arg, index) {
-    if (typeof(arg)==='function') {
-      todos.push(function (done) {
-        debug('evalute.args index=%j', index);
-        arg(argv, serviceDefinition, function (val) {
-          args[index] = val.toString();
-          debug('evalute.args val=%j', val.toString());
-          done();
-        })
-      })
-    } else {
-      args[index] = arg.toString()
-    }
-  })
-  return todos;
-}
-
-function evaluteServiceEnvs (argv, serviceDefinition, envs){
-  var todos = [];
-  Object.keys(envs).forEach(function (name, index) {
-    var env = envs[name];
-    if (typeof(env)==='function') {
-      todos.push(function (done) {
-        debug('evalute.env name=%j', name);
-        env(argv, serviceDefinition, function (val) {
-          envs[name] = val.toString();
-          debug('evalute.env val=%j', val.toString());
-          done();
-        })
-      })
-    } else {
-      envs[name] = env.toString();
-    }
-  })
-  return todos;
-}
-
-function serviceDefinitionFromFile (pkgInfo) {
-  var serviceDefinition = require(pkgInfo.path + '/nsi.js');
-  if (serviceDefinition.start.bin==='node')
-    serviceDefinition.start.bin = process.argv[0];
-  if (!serviceDefinition.name)
-    serviceDefinition.pkgName = pkgInfo.name;
-  return serviceDefinition;
-}
-
-function serviceDefinitionFromStartScript (pkgInfo) {
-  var p = cLineParser(pkgInfo.scripts.start);
-  debug('p=%j', p)
-  var serviceDefinition = {
-    pkgName: pkgInfo.name,
-    author: pkgInfo.author && pkgInfo.author.name,
-    description: pkgInfo.description,
-    start: {
-      bin: p.prg,
-      args: p.args
-    },
-    env: {},
-  }
-  if (serviceDefinition.start.bin==='node')
-    serviceDefinition.start.bin = process.argv[0];
-  return serviceDefinition;
 }
 
 function isValidPackage(info, then) {

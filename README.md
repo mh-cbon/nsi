@@ -68,9 +68,10 @@ nsi stop [service]
 nsi reload [service]
   Where [service] is the name of an existing service.
   Reloads the given service.
-  Available with chkconfig, systemd, upstart if the package
+  Available with chkconfig, systemd if the package
   provide a reload command.
-  Fallback to a restart if the underlying system
+  With upstart it triggers a SIGHUP.
+  Fallback to a restart command if the underlying system
   is not able to perform the operation.
 
 nsi validate [package source]
@@ -78,6 +79,7 @@ nsi validate [package source]
 
 nsi generate
   Generate the nsi service definition file for the package on the current cwd.
+  It looks for an npm start script and transforms it into an nsi.js file.
 
 ```
 
@@ -214,8 +216,7 @@ You must provide `nsiversion` and `start` fields.
 # Todo
 
 - add `edit` command !!
-- add `generate` command !!
-- improve this readme
+- improve this README
 - add system wide service setup
 - add sysv support
 - add openrc support

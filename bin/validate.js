@@ -2,8 +2,6 @@ var spawn       = require('child_process').spawn;
 var fs          = require('fs')
 var path        = require('path')
 var async       = require('async')
-var yesNo       = require('../lib/yesno.js')
-var cLineParser = require('cline-parser');
 var isPkgInst   = require('../lib/is-pkg-installed.js')
 var whichSc     = require('@mh-cbon/which-service-manager');
 var pkg         = require('../package.json');
@@ -29,6 +27,9 @@ var validate = function (argv, allDone) {
           console.log('✖ Your init system is not found');
           return next();
         }
+        if (serviceManager==='sysv')
+          return next('✖ Sorry this init system is not yet handled.');
+
         console.log('✓ Your init system is %s', serviceManager);
         next();
       })
@@ -91,6 +92,8 @@ var validate = function (argv, allDone) {
           }
         }
       }
+      if (!isValid) return next('This package ca nt be installed as a service');
+      console.log('Success ! You can install this package as a service !')
       next();
     },
   ], allDone)
